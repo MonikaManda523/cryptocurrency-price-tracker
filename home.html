@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Crypto Price Tracker</title>
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial, sans-serif;
+}
+
+body{
+    background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+
+.container{
+    width:420px;
+    background:rgba(255,255,255,0.12);
+    backdrop-filter:blur(12px);
+    padding:25px;
+    border-radius:15px;
+    color:white;
+    box-shadow:0 10px 25px rgba(0,0,0,.4);
+}
+
+h1{
+    text-align:center;
+    margin-bottom:20px;
+}
+
+.search{
+    display:flex;
+    gap:10px;
+}
+
+input{
+    flex:1;
+    padding:12px;
+    border:none;
+    border-radius:8px;
+    outline:none;
+    font-size:16px;
+}
+
+button{
+    padding:12px 18px;
+    background:#00c6ff;
+    color:white;
+    border:none;
+    border-radius:8px;
+    cursor:pointer;
+    font-size:16px;
+}
+
+button:hover{
+    background:#0099cc;
+}
+
+.card{
+    margin-top:25px;
+    text-align:center;
+    display:none;
+}
+
+.card img{
+    width:80px;
+    margin-bottom:10px;
+}
+
+.card h2{
+    margin-bottom:10px;
+}
+
+.info{
+    margin-top:15px;
+    text-align:left;
+}
+
+.info p{
+    padding:8px;
+    border-bottom:1px solid rgba(255,255,255,.2);
+}
+
+.error{
+    text-align:center;
+    color:#ff8080;
+    margin-top:20px;
+    display:none;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>💰 Crypto Price Tracker</h1>
+
+<div class="search">
+
+<input
+type="text"
+id="coin"
+placeholder="bitcoin, ethereum, solana">
+
+<button onclick="getCrypto()">
+Search
+</button>
+
+</div>
+
+<div class="error" id="error">
+Coin Not Found
+</div>
+
+<div class="card" id="card">
+
+<img id="image">
+
+<h2 id="name"></h2>
+
+<h3 id="price"></h3>
+
+<div class="info">
+
+<p><b>Market Cap:</b> <span id="marketcap"></span></p>
+
+<p><b>24H High:</b> <span id="high"></span></p>
+
+<p><b>24H Low:</b> <span id="low"></span></p>
+
+<p><b>Price Change:</b> <span id="change"></span></p>
+
+</div>
+
+</div>
+
+</div>
+
+<script>
+
+async function getCrypto(){
+
+let coin=document.getElementById("coin").value.toLowerCase().trim();
+
+if(coin==""){
+
+alert("Please enter coin name");
+
+return;
+
+}
+
+let url=`https://api.coingecko.com/api/v3/coins/${coin}`;
+
+try{
+
+let response=await fetch(url);
+
+if(!response.ok){
+
+throw new Error("Not Found");
+
+}
+
+let data=await response.json();
+
+document.getElementById("error").style.display="none";
+document.getElementById("card").style.display="block";
+
+document.getElementById("image").src=data.image.large;
+
+document.getElementById("name").innerHTML=data.name;
+
+document.getElementById("price").innerHTML=
+"$ "+data.market_data.current_price.usd;
+
+document.getElementById("marketcap").innerHTML=
+"$ "+data.market_data.market_cap.usd.toLocaleString();
+
+document.getElementById("high").innerHTML=
+"$ "+data.market_data.high_24h.usd;
+
+document.getElementById("low").innerHTML=
+"$ "+data.market_data.low_24h.usd;
+
+document.getElementById("change").innerHTML=
+data.market_data.price_change_percentage_24h.toFixed(2)+" %";
+
+}
+
+catch(error){
+
+document.getElementById("card").style.display="none";
+
+document.getElementById("error").style.display="block";
+
+}
+
+}
+
+document.getElementById("coin").addEventListener("keypress",function(e){
+
+if(e.key==="Enter"){
+
+getCrypto();
+
+}
+
+});
+
+</script>
+
+</body>
+</html>
